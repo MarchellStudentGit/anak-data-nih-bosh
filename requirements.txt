@@ -3,6 +3,5 @@ numpy
 matplotlib
 seaborn
 scikit-learn
-supabase
-python-dotenv
-streamlit
+imbalanced-learn
+joblib

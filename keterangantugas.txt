@@ -1,0 +1,15 @@
+Tugas ini merupakan tugas kelompok untuk mempraktikkan tahapan dalam mengerjakan
+project Data Science.
+Adapun aspek-aspek yang harus di telaah dalam setiap tahapan dan dipaparkan dalam
+laporan adalah:
+1. Business understanding : jelaskan proses bisnis dan permasalahan bisnis yang ingin di
+tangani. (minimal 500 kata)
+2. Data Collection and Understanding : jelaskan bagaimana cara mengidentifikasi data yang
+diperlukan, dari mana data tersebut diperoleh dan bagaimana memahami data yang sudah
+dikumpulkan? (minimal 300 kata)
+3. Data Preparation : bagaimana mengolah dari data mentah menjadi data set yang siap
+dimodelkan? apa saja yang dilakukan dalam tahapan persiapan data ini?
+4. Modelling : jelaskan alasan pemilihan modeling data yang dilakukan. Jelaskan proses
+modelling data yang dilakukan.
+5. Evaluation: jelaskan cara evaluasi model yang dilakukan. Bagaimana hasil evaluasinya?
+6. Deployment : jelaskan rencana deployment yang akan dilakukan. (minimal 300 kata)
