@@ -1,45 +1,40 @@
-# 📊 Analisis Kesejahteraan Sosial & Pipeline Data Science 2026
-> **Status Proyek:** `Branch: dev-marchell` — *Inisialisasi Pipeline & Sinkronisasi Database Selesai*
+# 💧 Sistem Prediksi Kelayakan dan Kualitas Air Minum
+**Mata Kuliah:** Metodologi Data Science
 
-Repositori ini memuat seluruh rangkaian pengerjaan tugas kelompok Metodologi Data Science, mulai dari pembersihan data mentah (*Data Wrangling*), analisis karakteristik (*EDA*), rekayasa fitur, pemodelan mesin pencari pola (*Clustering*), hingga tahap deployment otomatis ke cloud database dan visualisasi interaktif.
+Repositori ini memuat *source code* dan dokumentasi untuk memprediksi kelayakan air minum (apakah beracun atau aman untuk dikonsumsi) menggunakan Machine Learning (*Random Forest*).
 
----
-
-## 🚀 Progres Pengerjaan (Update Terbaru)
-
-Berikut adalah peta jalan (*roadmap*) arsitektur sistem yang telah selesai dibangun dan siap dikolaborasikan:
-
-| Tahap | Berkas Eksekusi | Deskripsi Status | Status |
-| :--- | :--- | :--- | :---: |
-| **Langkah 1** | `data_wrangling.py` | Pembersihan data mentah BPS, penanganan *missing values*, & standardisasi format. |  ✅ *Done* |
-| **Langkah 2** | `eda_kesejahteraan.py`| Eksplorasi karakteristik data sosial, visualisasi matriks korelasi, & distribusi fitur. | ✅ *Done* |
-| **Langkah 3** | `feature_engineering.py`| Seleksi fitur sensitif, reduksi dimensi, dan transformasi skala variabel numerik. | ✅ *Done* |
-| **Langkah 4** | `clustering_kmeans.py` | Implementasi algoritma K-Means untuk pengelompokan tingkat kesejahteraan. | ✅ *Done* |
-| **Langkah 5** | `deploy_supabase.py` | Automasi migrasi data hasil olahan dari lokal menuju Cloud Database (Supabase). | ✅ *Done* |
-| **Langkah 6** | `app.py` | Pembuatan visualisasi dan antarmuka *dashboard* interaktif menggunakan Streamlit. | ✅ *Done* |
+## 📂 Struktur Proyek
+- `Water_Quality_Project.py` : Skrip Machine Learning (EDA, Prep, SMOTE, Modeling).
+- `app.py` : Antarmuka Web App (Front-end) yang dibangun menggunakan Streamlit.
+- `Laporan_Tugas_Akhir.md` : Draf laporan akhir yang sangat lengkap (Business Understanding hingga Deployment).
+- `results/` : Menyimpan plot evaluasi (Confusion Matrix) dan File Model Machine Learning (`rf_model.pkl` & `scaler.pkl`).
+- `data/` : Dataset mentah yang digunakan untuk pembelajaran.
 
 ---
 
-## 🛠️ Spesifikasi Environment & Struktur Folder
+## 💻 Menjalankan di Lokal (Local Development)
+Untuk menjalankan **Web Aplikasi Prediksi** (UI/Front-end) di komputer Anda sendiri:
 
-Untuk memastikan kode berjalan dengan lancar tanpa kendala *package mismatch*, proyek ini menggunakan Virtual Environment (`env/`) terisolasi yang mendasarkan instalasinya pada pustaka berikut:
+1. **Pastikan library sudah ter-install:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Jalankan Aplikasi Web Streamlit:**
+   ```bash
+   streamlit run app.py
+   ```
+3. Aplikasi akan otomatis terbuka di *browser* Anda (biasanya di `http://localhost:8501`).
 
-### Komponen Utama `requirements.txt`
-* **Data Processing & Analytics:** `pandas`, `numpy`
-* **Visualizations:** `matplotlib`, `seaborn`
-* **Machine Learning Model:** `scikit-learn`
-* **Cloud Infrastructure:** `supabase`, `python-dotenv`
-* **Web Application:** `streamlit`
+---
 
-### Struktur Repositori
-```text
-anak-data-nih-bosh/
-├── data/
-│   ├── raw/                 # Data mentah hasil unduhan BPS
-│   └── clean/               # Berkas CSV hasil eksekusi data_wrangling.py
-├── plots/                   # Output visualisasi distribusi dan korelasi (.png)
-├── .env                     # [LOCAL ONLY] Kredensial & URL API Supabase (Hidden)
-├── .gitignore               # Proteksi internal Git agar folder env/ & .env tidak bocor
-├── requirements.txt         # Daftar dependencies library Python
-├── app.py                   # Berkas utama aplikasi web Streamlit
-└── README.md                # Dokumentasi proyek
+## 🚀 Panduan Deployment (Cloud Gratis)
+Karena proyek ini dituntut untuk profesional dan gratis, aplikasi dapat dengan mudah di-*deploy* (*hosting*) agar bisa diakses oleh publik (seperti dosen penguji) via internet.
+
+1. Pastikan Anda telah menekan **Push** agar semua kode terbaru ini masuk ke repositori GitHub Anda.
+2. Buka situs [Streamlit Community Cloud](https://share.streamlit.io/) dan buat akun (Sign Up menggunakan akun GitHub Anda).
+3. Setelah *login*, klik tombol biru **"New app"**.
+4. Pilih repositori GitHub Anda (`MarchellStudentGit/anak-data-nih-bosh`), *branch* `dev-marchell` atau `main`, dan set *Main file path* ke `app.py`.
+5. Klik **"Deploy!"**. 
+6. Dalam hitungan menit, aplikasi Anda akan online secara otomatis dan Anda akan mendapatkan *link URL* publik untuk dipamerkan.
+
+> **💡 Catatan Otomatis (CI/CD):** Jika ke depannya Anda memperbarui kode di GitHub, Streamlit Cloud akan secara otomatis mendeteksi pembaruan tersebut dan melakukan *deploy* ulang tanpa intervensi manual!
