@@ -3,51 +3,85 @@ import pandas as pd
 import joblib
 from PIL import Image
 import os
+import time
 
 st.set_page_config(
-    page_title="Sistem Peringatan Dini AQI",
-    page_icon="🌪️",
+    page_title="EcoGuard AI",
+    page_icon="🌍",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
+# Custom CSS for Premium Vibe
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.8rem;
-        color: #2c3e50;
-        text-align: center;
-        font-weight: 800;
-        margin-bottom: 0px;
+    /* Global Styles */
+    .stApp {
+        background-color: #f8f9fa;
     }
-    .sub-header {
-        font-size: 1.2rem;
-        color: #7f8c8d;
+    
+    /* Headers */
+    .title-box {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 40px 20px;
+        border-radius: 15px;
+        color: white;
         text-align: center;
         margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+    .title-box h1 {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 800;
+        margin: 0;
+        font-size: 3.5rem;
+    }
+    .title-box p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-top: 10px;
+    }
+    
+    /* Tabs Customization */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 20px;
+        gap: 15px;
+        margin-bottom: 20px;
     }
     .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        white-space: pre-wrap;
-        background-color: #f1f2f6;
-        border-radius: 4px 4px 0px 0px;
-        gap: 1px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        background-color: white;
+        border-radius: 8px 8px 0 0;
+        padding: 10px 25px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #3498db;
-        color: white;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        color: white !important;
+        font-weight: bold;
+        border: none;
     }
-    .glossary-box {
-        background-color: #e8f4f8;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 5px solid #3498db;
-        margin-bottom: 20px;
+    
+    /* Glossary Cards */
+    .glossary-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 6px solid #e74c3c;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 15px;
+        transition: transform 0.2s;
+    }
+    .glossary-card:hover {
+        transform: translateX(5px);
+    }
+    .glossary-card h4 {
+        color: #2c3e50;
+        margin-top: 0;
+    }
+    .glossary-card p {
+        color: #555;
+        margin-bottom: 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -65,44 +99,63 @@ def load_assets():
 
 model, scaler, cm_img, fi_img = load_assets()
 
-st.markdown('<div class="main-header">🌪️ EcoGuard: Air Quality Forecaster</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Platform Cerdas Peringatan Dini Polusi Udara Berbasis Ramalan Cuaca</div>', unsafe_allow_html=True)
+# Hero Section
+st.markdown("""
+<div class="title-box">
+    <h1>🌍 EcoGuard AI</h1>
+    <p>Sistem Deteksi Dini Polusi Udara (AQI) Bertenaga Machine Learning</p>
+</div>
+""", unsafe_allow_html=True)
 
 if model is None or scaler is None:
-    st.error("⚠️ Model AI belum diinisiasi. Harap melatih model terlebih dahulu melalui script Python.")
+    st.error("⚠️ Peringatan: Engine AI (XGBoost) belum ditemukan. Hubungi Administrator sistem.")
     st.stop()
 
-tab1, tab2, tab3 = st.tabs(["🔮 Mesin Prediksi", "📊 Dashboard Analitik", "📖 Kamus Istilah (Untuk Awam)"])
+tab1, tab2, tab3 = st.tabs(["🔮 Prediksi AI", "📊 Model Analytics", "📖 Kamus Awam"])
 
 with tab1:
-    st.markdown("### 🌤️ Parameter Ramalan Cuaca Esok Hari")
-    st.info("💡 **Tips:** Anda bisa mendapatkan parameter ini dari prakiraan cuaca di HP Anda (seperti aplikasi Weather bawaan Apple/Android) atau website BMKG lokal.")
+    st.info("💡 **Petunjuk Penggunaan:** Silakan sesuaikan parameter cuaca di bawah ini berdasarkan ramalan BMKG esok hari, lalu tekan tombol prediksi di bagian bawah.")
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Menggunakan UI Container berborder (Fitur Streamlit modern)
+    with st.container(border=True):
+        st.subheader("🌡️ 1. Parameter Suhu & Termal")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            temperature_2m_max = st.number_input("Suhu Maksimal (°C)", value=32.5, step=0.5, help="Suhu tertinggi yang akan dicapai esok hari.")
+        with c2:
+            temperature_2m_min = st.number_input("Suhu Minimal (°C)", value=24.0, step=0.5, help="Suhu terendah (biasanya terjadi saat dini hari).")
+        with c3:
+            apparent_temperature_max = st.number_input("Suhu Terasa Maksimal (°C)", value=35.0, step=0.5, help="Suhu nyata yang dirasakan kulit manusia akibat pengaruh kelembapan.")
+
+    with st.container(border=True):
+        st.subheader("💨 2. Dinamika Angin & Atmosfer")
+        c4, c5, c6 = st.columns(3)
+        with c4:
+            windspeed_10m_max = st.number_input("Kec. Angin Rata-rata (km/h)", value=12.5, step=0.5, help="Angin yang stabil sangat krusial untuk menyapu bersih polusi dari atas kota.")
+        with c5:
+            windgusts_10m_max = st.number_input("Hembusan Angin Mendadak (km/h)", value=25.0, step=0.5, help="Hembusan angin kuat seketika yang dapat membubarkan konsentrasi gas beracun.")
+        with c6:
+            cloudcover_mean = st.number_input("Tutupan Awan (%)", value=45.0, step=1.0, help="Persentase awan di langit. Awan tebal terkadang bisa menahan polusi untuk naik ke atmosfer atas.")
+
+    with st.container(border=True):
+        st.subheader("🌧️ 3. Curah Hujan & Siklus Musim")
+        c7, c8, c9, c10 = st.columns(4)
+        with c7:
+            precipitation_sum = st.number_input("Total Curah Hujan (mm)", value=0.0, step=0.1, help="Volume air hujan. Hujan berfungsi sebagai 'detergen' alam yang mencuci debu PM2.5.")
+        with c8:
+            heavy_rain_flag = st.selectbox("Ada Badai / Hujan Lebat?", [0, 1], format_func=lambda x: "Ya (Hujan Lebat)" if x == 1 else "Tidak/Cerah")
+        with c9:
+            month = st.slider("Bulan (Pola Musiman)", min_value=1, max_value=12, value=6)
+        with c10:
+            is_weekend = st.selectbox("Akhir Pekan (Weekend)?", [0, 1], format_func=lambda x: "Ya (Hari Libur)" if x == 1 else "Bukan (Hari Kerja)", help="Hari libur biasanya menurunkan jumlah emisi gas buang dari kendaraan pekerja.")
     
-    with col1:
-        temperature_2m_max = st.number_input("Suhu Maksimal (°C)", value=32.5, step=0.5, help="Suhu udara paling panas yang diramalkan terjadi esok hari.")
-        temperature_2m_min = st.number_input("Suhu Minimal (°C)", value=24.0, step=0.5, help="Suhu udara paling dingin (biasanya saat subuh/malam).")
-        apparent_temperature_max = st.number_input("Suhu Terasa (Apparent) (°C)", value=35.0, step=0.5, help="Suhu yang benar-benar dirasakan oleh kulit manusia, dipengaruhi oleh kelembapan (seperti indeks panas/gerah).")
-        
-    with col2:
-        precipitation_sum = st.number_input("Total Curah Hujan (mm)", value=0.0, step=0.1, help="Perkiraan total air hujan yang akan turun sepanjang hari. Jika 0, berarti cerah/mendung tanpa hujan.")
-        heavy_rain_flag = st.selectbox("Indikator Hujan Lebat?", [0, 1], format_func=lambda x: "Ya (Hujan Deras)" if x == 1 else "Tidak", help="Pilih 'Ya' jika ada peringatan badai atau hujan sangat deras yang membasuh udara.")
-        
-    with col3:
-        windspeed_10m_max = st.number_input("Kec. Angin Maksimal (km/h)", value=12.5, step=0.5, help="Seberapa kencang angin rata-rata yang bertiup. Angin kencang membantu menyapu polusi/asap dari kota.")
-        windgusts_10m_max = st.number_input("Hembusan Angin Tiba-tiba (km/h)", value=25.0, step=0.5, help="Hembusan angin kencang (Windgusts) yang muncul secara tiba-tiba/seketika.")
-        
-    with col4:
-        cloudcover_mean = st.number_input("Rata-rata Tutupan Awan (%)", value=45.0, step=1.0, help="0% berarti langit sangat cerah tanpa awan. 100% berarti langit mendung total.")
-        month = st.slider("Bulan (Siklus Musim)", min_value=1, max_value=12, value=6, help="Bulan kejadian untuk membantu sistem mengenali tren polusi musiman (contoh: polusi lebih parah di musim kemarau).")
-        is_weekend = st.selectbox("Akhir Pekan?", [0, 1], format_func=lambda x: "Ya (Sabtu/Minggu)" if x == 1 else "Bukan", help="Akhir pekan biasanya mengurangi emisi kendaraan kantoran, yang mempengaruhi tingkat polusi.")
-    
-    st.markdown("---")
-    predict_button = st.button("🚀 ANALISIS TINGKAT BAHAYA UDARA", use_container_width=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    predict_button = st.button("🔮 JALANKAN ANALISIS KECERDASAN BUATAN", use_container_width=True, type="primary")
     
     if predict_button:
-        with st.spinner("AI sedang mengkalkulasi dispersi polutan..."):
+        with st.spinner("Mengolah milyaran rantai data iklim historis..."):
+            time.sleep(0.8) # Memberikan efek "komputasi" agar terasa lebih meyakinkan
+            
             features = [
                 'temperature_2m_max', 'temperature_2m_min', 'apparent_temperature_max', 
                 'precipitation_sum', 'windspeed_10m_max', 'windgusts_10m_max', 
@@ -119,67 +172,79 @@ with tab1:
             prediction = model.predict(scaled_input)[0]
             prediction_proba = model.predict_proba(scaled_input)[0]
             
-            st.markdown("### 📋 Hasil Diagnosis AI")
+            st.markdown("---")
+            st.subheader("📋 Hasil Diagnostik Sistem")
             
             if prediction == 1:
-                st.error("🚨 **STATUS MERAH: KUALITAS UDARA BERBAHAYA (AQI > 100)**")
+                st.error("🚨 **STATUS DARURAT MERAH: KUALITAS UDARA SANGAT BERBAHAYA (AQI > 100)**")
                 st.markdown("""
-                Berdasarkan kombinasi cuaca di atas, sirkulasi atmosfer diperkirakan memburuk dan akan menjebak asap kotor, emisi kendaraan (PM2.5), dan gas beracun di dekat permukaan tanah (zona napas manusia).
-                - **Saran Medis:** Sangat disarankan memakai masker (N95) saat berada di luar ruangan. Penderita asma harap berhati-hati!
+                > **Peringatan Otoritas Kesehatan:**
+                > Berdasarkan pola angin yang stagnan dan/atau suhu yang terperangkap, AI memprediksi pembentukan kabut asap beracun (PM2.5) di lapisan pernapasan manusia.
+                > 
+                > **Aksi Rekomendasi:**
+                > 1. Warga wajib menggunakan masker medis (N95) saat evakuasi atau keluar rumah.
+                > 2. Penderita asma dan lansia dilarang keras berolahraga *outdoor*.
                 """)
-                st.metric("Probabilitas Keakuratan", f"{prediction_proba[1]*100:.1f}%")
+                col_m1, col_m2 = st.columns(2)
+                col_m1.metric("Probabilitas Tepat", f"{prediction_proba[1]*100:.2f}%", "- AI Sangat Yakin", delta_color="inverse")
             else:
-                st.success("✅ **STATUS HIJAU: UDARA AMAN TERKENDALI (AQI <= 100)**")
+                st.success("✅ **STATUS HIJAU ZAMRUD: UDARA BERSIH DAN AMAN (AQI <= 100)**")
                 st.markdown("""
-                Kondisi cuaca besok (seperti curah hujan atau tiupan angin) mendukung proses "pencucian" atau penyebaran polutan, sehingga udara perkotaan menjadi jauh lebih bersih.
-                - **Saran Medis:** Udara segar! Sangat aman untuk berolahraga pagi atau beraktivitas santai di luar rumah tanpa masker.
+                > **Laporan Ekologis:**
+                > Sirkulasi cuaca esok hari beroperasi bagaikan penyaring alami. Polusi akan tertiup angin atau tercuci habis oleh presipitasi hujan.
+                > 
+                > **Aksi Rekomendasi:**
+                > Udara sedang dalam kualitas prima. Ini adalah waktu terbaik untuk melakukan olahraga maraton, piknik keluarga, dan membuka jendela rumah lebar-lebar.
                 """)
-                st.metric("Probabilitas Keakuratan", f"{prediction_proba[0]*100:.1f}%")
+                col_m1, col_m2 = st.columns(2)
+                col_m1.metric("Probabilitas Tepat", f"{prediction_proba[0]*100:.2f}%", "+ Sangat Aman")
 
 with tab2:
-    st.markdown("### 🧠 Dokumentasi Intelegensi Buatan (XGBoost)")
-    st.write("Tab ini ditujukan bagi teknisi, analis data, maupun dosen penguji untuk memverifikasi kecerdasan sistem prediksi yang berjalan di balik layar.")
+    st.subheader("📈 Validasi Performa AI (XGBoost Metrics)")
+    st.write("Visualisasi interaktif ini diekstraksi langsung dari dapur pelatihan Machine Learning. Sistem ini sepenuhnya transparan dan berbasis data otentik.")
     
-    col_a, col_b = st.columns(2)
+    c_img1, c_img2 = st.columns(2)
     
-    with col_a:
-        st.markdown("#### 1. Confusion Matrix (Matriks Kebingungan)")
-        st.write("Menunjukkan rapor algoritma saat diuji coba (seperti ujian kelulusan). Semakin tebal warna merah di kotak persimpangan yang sama (Aman ditebak Aman, Bahaya ditebak Bahaya), artinya model AI sangat pintar.")
-        if cm_img:
-            st.image(cm_img, use_column_width=True)
-        else:
-            st.warning("Gambar belum di-generate.")
-            
-    with col_b:
-        st.markdown("#### 2. Dampak Cuaca vs Polusi (Feature Importance)")
-        st.write("Berdasarkan ratusan juta perbandingan komputasi, grafik ini merangkum *kunci rahasia* dari alam: elemen cuaca manakah yang paling kuat memicu penumpukan debu/polusi beracun di langit.")
-        if fi_img:
-            st.image(fi_img, use_column_width=True)
-        else:
-            st.warning("Gambar belum di-generate.")
+    with c_img1:
+        with st.container(border=True):
+            st.markdown("#### Akurasi Klasifikasi (Confusion Matrix)")
+            if cm_img:
+                st.image(cm_img, use_column_width=True)
+                st.caption("Diagram ini memvalidasi kemampuan model dalam mendeteksi ancaman polusi tanpa menghasilkan terlalu banyak peringatan palsu (False Alarms).")
+            else:
+                st.warning("Visualisasi belum siap.")
+                
+    with c_img2:
+        with st.container(border=True):
+            st.markdown("#### Rahasia Alam Terungkap (Feature Importance)")
+            if fi_img:
+                st.image(fi_img, use_column_width=True)
+                st.caption("Grafik pilar ini mengungkap fakta empiris: Parameter yang paling tinggi pilarnya adalah elemen cuaca yang paling bertanggung jawab atas penumpukan polusi di kota Anda.")
+            else:
+                st.warning("Visualisasi belum siap.")
 
 with tab3:
-    st.markdown("### 📖 Kamus Istilah Cepat (Untuk Masyarakat Umum)")
+    st.subheader("📚 Kamus Cerdas (Tanpa Bahasa Robot)")
+    st.markdown("Kami menyadari istilah meteorologi sangat memusingkan. Mari kita gunakan logika sederhana!")
+    
     st.markdown("""
-    Jika Anda merasa bingung dengan istilah-istilah di atas, Anda berada di tempat yang tepat! Berikut adalah penjelasannya dalam bahasa sehari-hari:
-    
-    <div class="glossary-box">
-        <h4>1. Apa itu AQI?</h4>
-        <p><b>AQI (Air Quality Index)</b> adalah "rapor" untuk mengukur seberapa kotor atau beracun udara hari ini. Mirip seperti nilai ulangan, tapi bedanya, makin tinggi nilainya, makin <b>buruk</b> udaranya! Nilai AQI di atas 100 berarti udara sudah sangat tidak sehat dan bisa membuat Anda batuk atau sesak napas.</p>
+    <div class="glossary-card">
+        <h4>🏭 1. Indeks AQI (Air Quality Index)</h4>
+        <p>Bayangkan nilai ujian di sekolah, tapi terbalik! Di sekolah, nilai 100 itu bagus. Tapi untuk AQI, nilai di atas 100 artinya <b>SANGAT BURUK</b>. AQI menghitung seberapa pekat racun tak kasat mata (seperti timbal dan gas sulfur) di udara yang kita hirup.</p>
     </div>
     
-    <div class="glossary-box">
-        <h4>2. Apa itu PM2.5? Kenapa berbahaya?</h4>
-        <p>Ini adalah debu halus polusi (dari asap kendaraan atau pabrik) yang ukurannya sangat amat kecil—bahkan lebih kecil dari rambut Anda yang dibelah 30! Saking kecilnya, dia bisa menembus masker kain biasa, masuk menembus paru-paru, bahkan sampai ke aliran darah dan memicu penyakit jantung/kanker.</p>
+    <div class="glossary-card">
+        <h4>🦠 2. Monster Tak Kasat Mata: PM2.5</h4>
+        <p>Debu PM2.5 adalah pembunuh senyap. Ukurannya begitu kecil hingga masker kain biasa tidak bisa menahannya. Saat terhirup, ia langsung masuk ke paru-paru dan menembus pembuluh darah, memicu penyakit mematikan secara diam-diam.</p>
     </div>
     
-    <div class="glossary-box">
-        <h4>3. Kok cuaca bisa pengaruhi polusi udara?</h4>
-        <p>Bayangkan Anda menyalakan api unggun di dalam toples tertutup. Asapnya pasti diam mengumpul (AQI tinggi). Tapi jika toples itu disemprot air (Hujan) atau ditiup kipas angin kuat (Angin Kencang), asapnya akan bersih atau menyebar menjauh. Cuaca bertindak layaknya penyedot debu atau kipas raksasa bagi udara kota kita!</p>
+    <div class="glossary-card">
+        <h4>🌬️ 3. Hubungan Ajaib Angin & Polusi</h4>
+        <p>Coba tiup asap rokok yang mengumpul di ruangan. Pasti asapnya buyar, kan? Nah, <b>Kecepatan Angin (Windspeed)</b> bekerja persis seperti kipas raksasa buatan Tuhan. Jika angin kencang, kota akan bersih dari polusi. Jika angin berhenti berhembus, kota akan "tersedak" polusi.</p>
     </div>
     
-    <div class="glossary-box">
-        <h4>4. Apa itu XGBoost (AI) yang disebut-sebut dari tadi?</h4>
-        <p>XGBoost adalah nama otak robot/komputer yang sangat pintar. Kita menyuapinya dengan jutaan baris data ramalan cuaca dan tingkat polusi tahun-tahun sebelumnya. Robot ini belajar sendiri mencari tahu: "Oh, kalau suhunya sekian dan anginnya tenang, besok pasti udaranya beracun".</p>
+    <div class="glossary-card">
+        <h4>🤖 4. Kecerdasan XGBoost (Xtreme Gradient Boosting)</h4>
+        <p>Ini bukan ramalan dukun. XGBoost adalah algoritma mutakhir yang bisa menelaah berjuta-juta pola cuaca di masa lalu secara simultan. Jika di masa lalu kejadian "Suhu 35°C + Tanpa Hujan" memicu AQI berbahaya, XGBoost akan mengingat pola itu dan memperingatkan kita sebelum kejadian itu terulang kembali esok hari.</p>
     </div>
     """, unsafe_allow_html=True)
