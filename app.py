@@ -6,20 +6,15 @@ import os
 import time
 
 st.set_page_config(
-    page_title="EcoGuard AI",
+    page_title="EcoGuard by Anak Data",
     page_icon="🌍",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for Premium Vibe
+# Custom CSS for Premium Vibe (Dark Mode Compatible)
 st.markdown("""
 <style>
-    /* Global Styles */
-    .stApp {
-        background-color: #f8f9fa;
-    }
-    
     /* Headers */
     .title-box {
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -28,7 +23,7 @@ st.markdown("""
         color: white;
         text-align: center;
         margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     .title-box h1 {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -42,17 +37,15 @@ st.markdown("""
         margin-top: 10px;
     }
     
-    /* Tabs Customization */
+    /* Tabs Customization (Theme Aware) */
     .stTabs [data-baseweb="tab-list"] {
         gap: 15px;
         margin-bottom: 20px;
     }
     .stTabs [data-baseweb="tab"] {
-        background-color: white;
         border-radius: 8px 8px 0 0;
         padding: 10px 25px;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        border: 1px solid #e0e0e0;
         border-bottom: none;
     }
     .stTabs [aria-selected="true"] {
@@ -62,13 +55,12 @@ st.markdown("""
         border: none;
     }
     
-    /* Glossary Cards */
+    /* Glossary Cards (Transparent for Dark Mode) */
     .glossary-card {
-        background-color: white;
+        background-color: rgba(128, 128, 128, 0.1);
         padding: 20px;
         border-radius: 10px;
         border-left: 6px solid #e74c3c;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         margin-bottom: 15px;
         transition: transform 0.2s;
     }
@@ -76,11 +68,9 @@ st.markdown("""
         transform: translateX(5px);
     }
     .glossary-card h4 {
-        color: #2c3e50;
         margin-top: 0;
     }
     .glossary-card p {
-        color: #555;
         margin-bottom: 0;
     }
 </style>
@@ -102,8 +92,8 @@ model, scaler, cm_img, fi_img = load_assets()
 # Hero Section
 st.markdown("""
 <div class="title-box">
-    <h1>🌍 EcoGuard AI</h1>
-    <p>Sistem Deteksi Dini Polusi Udara (AQI) Bertenaga Machine Learning</p>
+    <h1>🌍 EcoGuard Analytics</h1>
+    <p>Sistem Deteksi Dini Polusi Udara (AQI) — <b>Anak Data Nih Bosh!</b></p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -209,7 +199,7 @@ with tab2:
         with st.container(border=True):
             st.markdown("#### Akurasi Klasifikasi (Confusion Matrix)")
             if cm_img:
-                st.image(cm_img, use_column_width=True)
+                st.image(cm_img, use_container_width=True)
                 st.caption("Diagram ini memvalidasi kemampuan model dalam mendeteksi ancaman polusi tanpa menghasilkan terlalu banyak peringatan palsu (False Alarms).")
             else:
                 st.warning("Visualisasi belum siap.")
@@ -218,7 +208,7 @@ with tab2:
         with st.container(border=True):
             st.markdown("#### Rahasia Alam Terungkap (Feature Importance)")
             if fi_img:
-                st.image(fi_img, use_column_width=True)
+                st.image(fi_img, use_container_width=True)
                 st.caption("Grafik pilar ini mengungkap fakta empiris: Parameter yang paling tinggi pilarnya adalah elemen cuaca yang paling bertanggung jawab atas penumpukan polusi di kota Anda.")
             else:
                 st.warning("Visualisasi belum siap.")
