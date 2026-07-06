@@ -1,58 +1,63 @@
-# Laporan Tugas Akhir: Sistem Prediksi Kualitas Udara Berdasarkan Cuaca Global
+# Laporan Tugas Akhir: Prediksi Indeks Kualitas Udara (AQI) Menggunakan Data Meteorologi
 
 **Mata Kuliah:** Metodologi Data Science
 **Tema:** Prediksi Indeks Kualitas Udara (AQI) Menggunakan Data Meteorologi (*Weather-based Air Quality Forecasting*)
+**Kelompok:** Anak Data Nih Bosh
+
+**Anggota Kelompok:**
+1. Marchell Adi Pratama (672023081)
+2. Hendy Christian Nugroho (672023161)
+3. Maria Anne Pujara (672023268)
 
 ---
 
 ## 1. Business Understanding
 **Latar Belakang dan Proses Bisnis Saat Ini**
-Polusi udara merupakan salah satu ancaman lingkungan dan kesehatan publik paling serius di abad ke-21. Partikel halus (PM2.5, PM10) dan gas beracun (NO2, SO2, Ozon) yang melampaui ambang batas memicu penyakit kardiovaskular dan pernapasan akut. Dalam ekosistem manajemen tata kota pintar (*smart city*), pemantauan kualitas udara dilakukan melalui stasiun sensor (*Air Quality Monitoring Stations*). Sensor-sensor ini menghasilkan angka Indeks Kualitas Udara (AQI) secara *real-time*. Proses bisnis saat ini masih bersifat *reaktif*; artinya, pemerintah kota baru menyebarkan peringatan bahaya polusi kepada warganya *setelah* sensor mendeteksi lonjakan racun di udara.
+Kualitas udara merupakan salah satu indikator lingkungan yang berdampak langsung pada kesehatan masyarakat. Konsentrasi partikulat seperti PM2.5 dan PM10 serta gas berbahaya seperti NO2 dan SO2 dipantau secara rutin melalui stasiun pemantau kualitas udara, yang kemudian diinterpretasikan dalam bentuk Indeks Kualitas Udara (AQI). Saat ini, sistem penyampaian informasi kualitas udara umumnya bersifat reaktif, yaitu melaporkan status AQI berdasarkan pengamatan saat ini tanpa adanya peringatan dini terkait kemungkinan peningkatan polusi pada hari berikutnya.
 
 **Permasalahan Bisnis (Business Problem)**
-Kelemahan sistem reaktif adalah hilangnya "jendela waktu emas" bagi warga untuk membatalkan aktivitas luar ruangan dan bagi rumah sakit untuk bersiaga. Persebaran polutan di atmosfer sangat dipengaruhi oleh faktor iklim mikro. Curah hujan tinggi bertindak membersihkan polutan, sedangkan kelembapan tinggi dan hembusan angin yang stagnan membuat emisi kendaraan terperangkap di bawah atmosfer. Prediksi kualitas udara esok hari masih sangat sulit dilakukan hanya bermodalkan tren historis polusi semata.
+Pendekatan reaktif membatasi ruang bagi masyarakat maupun instansi terkait untuk melakukan tindakan preventif. Kualitas udara tidak hanya dipengaruhi oleh sumber emisi, namun juga berkorelasi dengan parameter meteorologi. Curah hujan dan kecepatan angin yang tinggi dapat membantu dispersi polutan, sementara kondisi atmosfer yang stabil dan suhu tertentu dapat menyebabkan polutan terakumulasi. Mengandalkan data historis AQI semata untuk melakukan peramalan belum cukup efektif. 
 
-Oleh karena itu, diperlukan inovasi *Data Science* untuk merancang **Sistem Peringatan Dini Kualitas Udara (*Air Quality Early Warning System*)**. Sistem pendukung keputusan ini menggunakan peramalan cuaca—yang datanya sangat mudah dan presisi didapatkan—untuk memprediksi klasifikasi bahaya kualitas udara (AQI). Inovasi lintas-domain ini dapat memangkas waktu antisipasi menjadi *H-1* (sebelum kejadian), memungkinkan penghematan biaya kesehatan yang masif.
+Oleh karena itu, diperlukan sebuah model pemelajaran mesin (*machine learning*) yang mampu memprediksi klasifikasi bahaya AQI (Aman atau Tidak Sehat) berdasarkan peramalan cuaca ke depan. Pendekatan ini diharapkan dapat memberikan peringatan dini (*early warning*) agar masyarakat dapat mempersiapkan diri sebelum terpapar kualitas udara yang buruk.
 
 ## 2. Data Collection and Understanding
 **Data Collection (Pengumpulan Data)**
-Data dikumpulkan secara sekunder dari dua repositori internasional:
-1. **Dataset Kualitas Udara Global (`global_air_quality_dataset.csv`)**: Memuat 3.662 rekaman observasi harian polusi di 10 kota metropolitan besar (2024).
-2. **Dataset Cuaca Dunia (`worldwide_weather_2025.csv`)**: Memuat 14.600 rekaman iklim harian terperinci di 40 kota dunia (2025).
+Data yang digunakan merupakan data sekunder yang dikumpulkan dari repositori terbuka, terdiri dari dua himpunan data:
+1. **Dataset Kualitas Udara Global (`global_air_quality_dataset.csv`)**: Berisi observasi harian parameter polusi (AQI, PM2.5, PM10, NO2, dll.) di 10 kota besar pada tahun 2024 dengan total 3.662 baris.
+2. **Dataset Cuaca Dunia (`worldwide_weather_2025.csv`)**: Berisi data iklim harian (Suhu, Curah Hujan, Angin, dll.) di 40 kota pada tahun 2025 dengan total 14.600 baris.
 
 **Data Understanding (Pemahaman Data)**
-Melalui tahap *profiling*, diketahui terdapat **7 kota yang beririsan** di antara kedua dataset. Mengingat siklus iklim harian sangat terkait dengan musim tahunan, kedua dataset ini dapat diintegrasikan dengan asumsi bahwa siklus musim iklim dan dinamika harian memiliki keidentikan pola dari tahun ke tahun.
+Melalui proses eksplorasi data (*Exploratory Data Analysis*), ditemukan bahwa kedua dataset memiliki irisan sebanyak 7 kota yang sama. Mengingat pola klimatologi harian umumnya berulang secara tahunan (musiman), perbedaan tahun pencatatan pada kedua dataset ini dapat direkonsiliasi. Dataset cuaca tidak memiliki *missing values* yang signifikan, sementara atribut `AQI` pada dataset kualitas udara bertindak sebagai variabel respons kontinu.
 
 ## 3. Data Preparation
-Tahapan Persiapan Data dan Integrasi (*Data Preparation & Integration*) adalah kunci proyek ini karena menghubungkan disiplin meteorologi dan klimatologi:
+Tahapan integrasi dan pra-pemrosesan data dilakukan dengan langkah-langkah berikut:
 
-1. **Time-Shifting Alignment:** Menyelaraskan dimensi waktu. Dataset Kualitas Udara (2024) dimodifikasi tahunnya menjadi 2025.
-2. **Data Integration (Inner Join):** Melakukan metode *Inner Join* berdasarkan kolom kunci bersama: `City` dan `Date`. Hasilnya adalah dataset baru (Gabungan) berisi fitur cuaca bersanding langsung dengan skor AQI pada hari yang sama.
-3. **Pembentukan Target (Target Engineering):** Apabila $AQI > 100$, maka diberi label `1 (Berbahaya)`. Jika tidak, labelnya `0 (Aman)`.
-4. **Feature Expansion:** Fitur yang diekstraksi dimaksimalkan menjadi **10 Parameter Meteorologi**: Suhu Maksimal, Suhu Minimal, Suhu Terasa (Apparent), Curah Hujan, Kec. Angin, Kec. Hembusan Angin, Tutupan Awan, Flag Hujan Lebat, Bulan, dan Indikator Akhir Pekan. Penambahan fitur ini menjamin bahwa AI bisa mendeteksi interaksi cuaca yang sangat kompleks.
-5. **Class Balancing & Splitting:** Membagi data (*80% Training, 20% Testing*) dan menerapkan teknik sintesis data **SMOTE** pada data pelatihan.
-6. **Feature Scaling:** Seluruh input dinormalisasi menggunakan `StandardScaler`.
+1. **Time-Shifting Alignment:** Atribut tanggal pada dataset kualitas udara (2024) disesuaikan (*shifted*) menjadi 2025 agar sinkron dengan periode data cuaca.
+2. **Data Integration:** Kedua dataset digabungkan (*inner join*) berdasarkan kunci komposit berupa entitas `City` dan atribut `Date`. Proses ini menghasilkan himpunan data terpadu yang memetakan kondisi meteorologi dengan capaian AQI pada hari yang sama.
+3. **Pembentukan Variabel Target:** Variabel `AQI` didiskritisasi menjadi target klasifikasi biner. Nilai AQI $> 100$ (kategori tidak sehat/berbahaya) dilabeli sebagai kelas `1`, sedangkan nilai $\leq 100$ dilabeli kelas `0`.
+4. **Feature Selection & Expansion:** Mengeliminasi variabel yang memicu *data leakage* dan menetapkan 10 atribut prediktor berbasis meteorologi: `temperature_2m_max`, `temperature_2m_min`, `apparent_temperature_max`, `precipitation_sum`, `windspeed_10m_max`, `windgusts_10m_max`, `cloudcover_mean`, `heavy_rain_flag`, `month`, dan `is_weekend`.
+5. **Class Balancing & Splitting:** Data dipartisi menjadi himpunan latih (80%) dan himpunan uji (20%). Mengingat distribusi kelas target yang tidak seimbang, metode **SMOTE** diaplikasikan pada himpunan latih untuk menyeimbangkan representasi sampel.
+6. **Feature Scaling:** Proses standardisasi (*Z-score normalization*) diterapkan menggunakan `StandardScaler`.
 
 ## 4. Modelling
 **Alasan Pemilihan Model & Proses Modelling:**
-Untuk menangkap korelasi non-linear yang rumit, kami memilih **XGBoost (Extreme Gradient Boosting)** sebagai model utama karena kebal terhadap pencilan cuaca esktrem.
-Model diinisialisasi dengan $n\_estimators=150, max\_depth=5$ dan dilatih menggunakan dataset gabungan yang sudah di-*balancing*. Objek *scaler* dan model diekspor ke `.pkl` menggunakan `joblib`.
+Algoritma **XGBoost (Extreme Gradient Boosting)** dipilih karena efisiensinya dalam menangani relasi non-linear yang kompleks dan kemampuannya mengelola potensi *outlier* pada data deret meteorologi. Model diinisialisasi dengan parameter `n_estimators=150` dan `max_depth=5`. Proses pelatihan model dilakukan menggunakan pustaka Scikit-Learn dan XGBoost pada himpunan data latih, dan luaran model (berserta objek *scaler*) diekspor dalam format `.pkl` untuk keperluan peluncuran (*deployment*).
 
 ## 5. Evaluation
-Kinerja model diuji pada himpunan data tak kasatmata (Testing Set). Hasil klasifikasi ditunjukkan pada visualisasi otomatis di bawah ini yang dibangkitkan langsung dari skrip Python.
+Kinerja model dikuantifikasi menggunakan *testing set*. Visualisasi di bawah ini menampilkan hasil evaluasi secara terstruktur.
 
 ### 5.1 Akurasi Prediksi (Confusion Matrix)
-Dalam desain *Early Warning System*, metrik **Recall** sangat diutamakan untuk meminimalisir kegagalan mendeteksi bahaya (*False Negative*).
+Dalam konteks prediksi bencana polusi udara, evaluasi ditekankan pada pengoptimalan metrik **Recall** untuk kelas positif. Hal ini bertujuan meminimalisasi *False Negative*, yaitu kondisi di mana model memprediksi udara aman padahal kenyataannya tingkat polusi berada pada ambang batas berbahaya.
 
 ![Confusion Matrix](results/confusion_matrix_weather_xgb.png)
 
-### 5.2 Dampak Cuaca terhadap Polusi (Feature Importance)
-Grafik di bawah ini memvalidasi teori fisika lingkungan, di mana algoritma XGBoost mengonfirmasi bahwa **Fluktuasi Suhu** dan **Hembusan Angin (Windspeed)** memiliki korelasi absolut tertinggi dalam menyebarkan polutan PM2.5 di langit kota.
+### 5.2 Signifikansi Fitur (Feature Importance)
+Grafik *Feature Importance* memperlihatkan bahwa suhu maksimal (`temperature_2m_max`) dan kecepatan angin (`windspeed_10m_max`) memiliki bobot yang paling dominan dalam penentuan kelas prediksi. Hal ini sejalan dengan tinjauan literatur yang menyatakan bahwa kelembapan atmosfer dan stagnasi sirkulasi udara berperan penting dalam pembentukan polutan tingkat permukaan.
 
 ![Feature Importance](results/feature_importances_weather_xgb.png)
 
 ## 6. Deployment
-Sistem cerdas ini diimplementasikan menggunakan arsitektur web modern yang dirancang "Sempurna".
-1. **Arsitektur Front-End (Web Dashboard):** Menggunakan framework **Streamlit**, kami merancang sistem UI cerdas dengan kapabilitas **2-Tab**. Tab 1 difungsikan sebagai "Mesin Prediksi Interaktif" untuk kalkulasi *real-time*. Tab 2 difungsikan sebagai "Dashboard Analitik Model" yang menanamkan (*embed*) dokumentasi grafik *Confusion Matrix* agar pengguna akhir bisa memvalidasi akurasi sistem.
-2. **Back-End Integration:** Menampung model XGBoost terkompresi. Ketika petugas kota menekan tombol "Analisis", aplikasi seketika menerjemahkan metrik cuaca esok hari menjadi status: "AWAS KUALITAS UDARA BERBAHAYA!"
-3. **Cloud Hosting Gratis (CI/CD):** Didistribusikan melalui **Streamlit Community Cloud** yang terhubung langsung ke GitHub (otomatis *update* 24/7 tanpa *downtime*). Inovasi lintas domain ini memberikan solusi kelas *Enterprise* secara cuma-cuma kepada pemangku kebijakan tata kota cerdas.
+Sistem prediksi yang telah divalidasi kemudian direkayasa menjadi antarmuka aplikasi interaktif (*web-based application*).
+1. **Antarmuka Front-End:** Aplikasi dibangun menggunakan kerangka kerja **Streamlit** (Python). Desain aplikasi dipartisi dalam tab fungsional untuk memudahkan pengguna dalam menginput metrik prakiraan cuaca, memantau *dashboard* hasil evaluasi model, dan membaca glosarium istilah terkait kualitas udara.
+2. **Integrasi Back-End:** Model XGBoost diimpor untuk menghitung probabilitas polusi berdasarkan nilai masukan pengguna secara waktu nyata (*real-time processing*).
+3. **Cloud Deployment:** Aplikasi ini ditempatkan pada server **Streamlit Community Cloud** yang terintegrasi secara *Continuous Deployment (CI/CD)* melalui repositori GitHub, sehingga memberikan ketersediaan akses publik yang stabil bagi kebutuhan demonstrasi maupun uji praktis lapangan.
