@@ -1,47 +1,79 @@
-# Prediksi Kualitas Udara (AQI) Berbasis Data Meteorologi
+<div align="center">
+  <img src="https://img.icons8.com/color/96/000000/air-quality.png" alt="EcoGuard Logo">
+  <h1>🌍 EcoGuard Analytics</h1>
+  <p><b>Sistem Cerdas Peringatan Dini Kualitas Udara (AQI) Berbasis Kondisi Meteorologi</b></p>
 
-**Mata Kuliah:** Metodologi Data Science
-**Tema:** Prediksi Indeks Kualitas Udara (AQI) Menggunakan Data Meteorologi (*Weather-based Air Quality Forecasting*)
-**Kelompok:** Anak Data Nih Bosh
-
-**Anggota Kelompok:**
-1. Marchell Adi Pratama (672023081)
-2. Hendy Christian Nugroho (672023161)
-3. Maria Anne Pujara (672023268)
-
-Repositori ini memuat *source code* dan dokumentasi untuk **Sistem Prediksi Kualitas Udara**. Sistem ini memanfaatkan model klasifikasi *Machine Learning* **XGBoost** untuk memprediksi probabilitas tingkat bahaya Kualitas Udara esok hari, dengan mengkorelasikan 10 parameter prakiraan cuaca sebagai variabel independen.
-
-## 📂 Struktur Repositori
-- `Air_Quality_Weather_Project.py` : Skrip utama yang mencakup pra-pemrosesan (*Data Integration, Time-Shifting, SMOTE*), pelatihan model XGBoost, dan visualisasi hasil evaluasi.
-- `app.py` : Skrip *Front-end* aplikasi antarmuka menggunakan **Streamlit** untuk memfasilitasi prediksi interaktif oleh pengguna.
-- `Laporan_Tugas_Akhir.md` : Dokumentasi lengkap yang mematuhi 6 fase metodologi CRISP-DM.
-- `results/` : Direktori yang menyimpan artefak visual (*Confusion Matrix* & *Feature Importance*) serta *binary file* objek model (`.pkl`).
-- `data/` : Direktori dataset mentah terkait data iklim dan observasi polusi (2024-2025).
-- `Proyek_Air_Lama/` : Direktori arsip bagi pekerjaan eksplorasi data pada topik yang sebelumnya diajukan.
+  [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+  [![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B.svg)](https://streamlit.io/)
+  [![XGBoost](https://img.shields.io/badge/XGBoost-Machine_Learning-orange.svg)](https://xgboost.readthedocs.io/)
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+</div>
 
 ---
 
-## 💻 Menjalankan Aplikasi secara Lokal
-Untuk menjalankan purwarupa aplikasi ini di *local machine*, ikuti instruksi berikut:
+## 📖 Tentang Proyek
+Polusi udara merupakan ancaman serius bagi kesehatan masyarakat perkotaan. Proyek **EcoGuard Analytics** dirancang sebagai sistem pendukung keputusan (*Decision Support System*) untuk memprediksi tingkat klasifikasi bahaya kualitas udara (Aman atau Tidak Sehat) menggunakan algoritma pemelajaran mesin **XGBoost**.
 
-1. **Instalasi Pustaka (Dependencies):**
+Tidak seperti sistem konvensional yang mengandalkan data polusi masa lalu, model ini menggunakan **prakiraan cuaca esok hari** (seperti kecepatan angin, curah hujan, dan suhu) sebagai fitur prediktor utama. Kondisi meteorologi terbukti memiliki pengaruh signifikan terhadap terperangkapnya atau tersebarnya polutan di lapisan atmosfer bawah.
+
+Proyek ini disusun untuk memenuhi **Tugas Akhir Mata Kuliah Metodologi Data Science**.
+
+---
+
+## 👥 Tim Pengembang (Anak Data Nih Bosh)
+- **Marchell Adi Pratama** (672023081)
+- **Hendy Christian Nugroho** (672023161)
+- **Maria Anne Pujara** (672023268)
+
+---
+
+## 🧠 Metodologi & Arsitektur Sistem
+
+Proyek ini dibangun mengikuti kerangka kerja standar industri **CRISP-DM** (Cross-Industry Standard Process for Data Mining):
+1. **Data Integration & Time-Shifting:** Menggabungkan dataset global observasi polusi dengan data ramalan cuaca (2024–2025).
+2. **Feature Engineering:** Mengekstraksi 10 parameter kunci, termasuk dinamika angin (*windgusts*), faktor pencucian udara oleh presipitasi (*heavy rain flag*), dan tren musiman.
+3. **Imbalance Handling:** Menggunakan algoritma **SMOTE** (Synthetic Minority Over-sampling Technique) untuk mengatasi ketimpangan kelas target bahaya.
+4. **Modelling:** Melatih klasifikasi ansambel **XGBoost** berkinerja tinggi.
+5. **Deployment:** Merancang arsitektur UI/UX analitik interaktif menggunakan kerangka kerja **Streamlit**.
+
+---
+
+## 📂 Struktur Direktori Repositori
+Hanya direktori *production-ready* yang disertakan dalam *repository* ini:
+```bash
+├── Air_Quality_Weather_Project.py   # Skrip ETL, Pemodelan, & Evaluasi AI
+├── app.py                           # Front-End Web Application (Streamlit)
+├── Laporan_Tugas_Akhir.md           # Laporan Akademis Komprehensif (Metodologi Lengkap)
+├── requirements.txt                 # Dependensi pustaka Python
+├── results/                         # Ekspor Model (*.pkl) dan visualisasi evaluasi model
+└── data/                            # Arsip dataset sumber sekunder
+```
+
+---
+
+## 🚀 Panduan Instalasi Lokal
+
+1. **Kloning Repositori:**
+   ```bash
+   git clone https://github.com/MarchellStudentGit/anak-data-nih-bosh.git
+   cd anak-data-nih-bosh
+   ```
+2. **Instalasi Pustaka (Dependencies):**
+   Disarankan menggunakan *virtual environment*.
    ```bash
    pip install -r requirements.txt
    ```
-2. **Menjalankan Aplikasi Streamlit:**
+3. **Eksekusi Aplikasi Web:**
    ```bash
    streamlit run app.py
    ```
-3. Aplikasi akan beroperasi secara otomatis dan dapat diakses melalui web browser pada alamat (`http://localhost:8501`).
+   Aplikasi akan otomatis beroperasi pada `http://localhost:8501`.
 
 ---
 
-## 🚀 Panduan Deployment (Streamlit Community Cloud)
-Aplikasi ini telah dirancang untuk mendukung *Continuous Deployment*.
-
-1. Pastikan perubahan mutakhir telah di-*push* ke *branch* utama (`dev-marchell` atau `main`) pada repositori GitHub lokal Anda.
-2. Akses platform [Streamlit Community Cloud](https://share.streamlit.io/) dan lakukan autentikasi dengan kredensial GitHub.
-3. Klik tombol **"New app"**.
-4. Pilih repositori `MarchellStudentGit/anak-data-nih-bosh`, pastikan pengaturan *branch* sudah tepat, lalu arahkan *Main file path* pada skrip `app.py`.
-5. Klik **"Deploy!"**.
-6. Sistem akan mengeksekusi kompilasi dependensi Python, dan aplikasi akan terpublikasi pada URL yang disediakan oleh Streamlit.
+## 🌐 Publikasi Jaringan (Cloud Deployment)
+Untuk mempublikasikan aplikasi analitik ini agar dapat diakses publik, sistem telah dioptimalkan untuk di-deploy secara *seamless* di **Streamlit Community Cloud**:
+1. Otorisasi akun GitHub Anda pada *dashboard* Streamlit Cloud.
+2. Hubungkan *repository* ini.
+3. Tetapkan `app.py` sebagai *entry point*.
+4. Sistem akan mendeteksi `requirements.txt` dan mengkompilasi *environment* secara otomatis.
